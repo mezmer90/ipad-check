@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#111214">
 <title>iPad (A16) Check</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 <header class="top">
@@ -38,6 +38,7 @@
         <button id="copy-sum" class="btn">Copy summary</button>
         <button id="reset" class="btn ghost">Reset checklist</button>
       </div>
+      <textarea id="sum-out" readonly hidden></textarea>
       <p class="muted small" id="save-note">Your marks and notes are saved in this browser on this device.</p>
     </div>
     <div id="sections"></div>
@@ -45,14 +46,26 @@
 
   <!-- TESTS -->
   <section id="tab-tests" class="panel">
-    <div class="card"><p class="muted">Run these on the iPad you are inspecting, in Safari. Allow camera, microphone and motion when asked. Mark each test and the matching checklist items update.</p>
+    <div class="card start">
+      <h2>Start here</h2>
+      <ol class="steps">
+        <li>Plug in the charger, set brightness to full and volume to about half.</li>
+        <li><b>Colours</b> (1 min): tap through each screen, hold to exit.</li>
+        <li><b>Touch</b> (1 min): paint the whole grid green, then 5 or more fingers at once.</li>
+        <li><b>Speakers</b> (30 s): landscape, Left, Right, Sweep, then Loud.</li>
+        <li><b>Mic</b> (15 s): record 5 seconds and play it back.</li>
+        <li><b>Cameras</b> (1 min): Front, then Back, take a snapshot of each.</li>
+        <li><b>Motion</b> and <b>Pencil</b> (30 s each, Pencil only if you have one).</li>
+        <li>Tap Passed or Issue found under each test. It fills in the checklist.</li>
+      </ol>
+      <p class="muted small">Allow camera, microphone and motion when Safari asks. If you tapped Don't Allow, tap aA in the address bar > Website Settings, or reload the page.</p>
       <div class="row wrap" id="test-jump"></div>
     </div>
 
     <div class="card test" id="t-colours">
       <h2>Screen colours</h2>
       <p>Full brightness first. Tap to move through black, white, red, green, blue, grey and a gradient. Look for dots that stay one colour (dead or stuck pixels), bright edges on black (backlight bleed), and blotches or tint on white and grey.</p>
-      <p class="muted small">Exit: press and hold for 1 second, or tap with two fingers.</p>
+      <p class="muted small">Exit: tap the Exit button (it shows for a moment after each tap), press and hold for 1 second, or tap with two fingers.</p>
       <div class="row wrap"><button class="btn primary" id="colour-start">Start colour test</button></div>
       <div class="mark" data-test="colours" data-items="p5,p6"></div>
     </div>
@@ -60,7 +73,7 @@
     <div class="card test" id="t-touch">
       <h2>Touch grid and multi-touch</h2>
       <p>Opens a full screen grid. Drag a finger over every cell until it all turns green. Then put up to 10 fingers down at once: the counter should follow each finger.</p>
-      <p class="muted small">Exit with the Done button in the top corner.</p>
+      <p class="muted small">Exit with the Done button in the corner. Tap Move to shift that bar so you can reach the cells under it.</p>
       <div class="row wrap"><button class="btn primary" id="touch-start">Start touch grid</button></div>
       <p id="touch-result" class="small"></p>
       <div class="mark" data-test="touch" data-items="p7"></div>
@@ -76,6 +89,7 @@
         <button class="btn" data-tone="sweep">Sweep left to right</button>
         <button class="btn" data-tone="bass">Bass rattle check</button>
         <button class="btn" data-tone="loud">Loud test (high volume)</button>
+        <button class="btn ghost" id="spk-stop">Stop sound</button>
       </div>
       <p id="spk-msg" class="muted small"></p>
       <div class="mark" data-test="speakers" data-items="a1"></div>
@@ -86,8 +100,10 @@
       <p>Allow microphone access, speak for 5 seconds from arm's length, then play it back. Listen for muffled or crackly sound.</p>
       <div class="row wrap">
         <button class="btn primary" id="mic-rec">Record 5 seconds</button>
+        <button class="btn ghost" id="mic-stop" disabled>Stop</button>
         <button class="btn" id="mic-play" disabled>Play back</button>
       </div>
+      <audio id="mic-audio" controls playsinline preload="auto" hidden></audio>
       <div class="meter"><div id="mic-level"></div></div>
       <p id="mic-msg" class="muted small"></p>
       <div class="mark" data-test="mic" data-items="a2"></div>
@@ -111,7 +127,7 @@
     <div class="card test" id="t-motion">
       <h2>Motion sensors</h2>
       <p>Tap Start and allow Motion and Orientation Access. Tilt the iPad slowly: the bubble and numbers should move smoothly. Flat on a table, tilt should read close to 0.</p>
-      <div class="row wrap"><button class="btn primary" id="motion-start">Start sensors</button></div>
+      <div class="row wrap"><button class="btn primary" id="motion-start">Start sensors</button><button class="btn ghost" id="motion-stop" disabled>Stop sensors</button></div>
       <div class="level"><div id="bubble"></div></div>
       <p id="motion-vals" class="mono small"></p>
       <p id="motion-msg" class="muted small"></p>
@@ -194,14 +210,14 @@
 </main>
 
 <!-- Fullscreen overlays -->
-<div id="colour-ov" class="overlay" hidden><span id="colour-label"></span></div>
+<div id="colour-ov" class="overlay" hidden><button id="colour-exit" class="btn">Exit</button><span id="colour-label"></span></div>
 <div id="touch-ov" class="overlay" hidden>
   <div id="touch-grid"></div>
-  <div id="touch-hud"><span id="touch-pct">0%</span> <span id="touch-now">0 touches</span> <span id="touch-max">max 0</span> <button id="touch-done" class="btn">Done</button> <button id="touch-clear" class="btn ghost">Clear</button></div>
+  <div id="touch-hud"><span id="touch-pct">0%</span> <span id="touch-now">0 touches</span> <span id="touch-max">max 0</span> <button id="touch-done" class="btn">Done</button> <button id="touch-clear" class="btn ghost">Clear</button> <button id="touch-move" class="btn ghost">Move</button></div>
   <div id="touch-dots"></div>
 </div>
 
-<script src="data.js"></script>
-<script src="app.js"></script>
+<script src="data.js?v=4"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>
