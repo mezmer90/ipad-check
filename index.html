@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#111214">
+<title>iPad (A16) Check</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">iPad (A16) Check</div>
+  <nav class="tabs" role="tablist">
+    <button class="tab" data-tab="checklist" role="tab">Checklist</button>
+    <button class="tab" data-tab="tests" role="tab">Tests</button>
+    <button class="tab" data-tab="ipad" role="tab">This iPad</button>
+  </nav>
+</header>
+
+<main>
+  <!-- CHECKLIST -->
+  <section id="tab-checklist" class="panel">
+    <div class="card">
+      <div class="prog-head"><strong id="pct">0% checked</strong><span id="prog-sub" class="muted"></span></div>
+      <div class="bar"><div id="bar-ok"></div><div id="bar-bad"></div></div>
+      <div id="deal" class="callout"></div>
+      <div class="row wrap">
+        <button class="seg" data-filter="all">All</button>
+        <button class="seg" data-filter="todo">To check</button>
+        <button class="seg" data-filter="issues">Issues</button>
+      </div>
+      <div class="row wrap">
+        <button id="copy-sum" class="btn">Copy summary</button>
+        <button id="reset" class="btn ghost">Reset checklist</button>
+      </div>
+      <p class="muted small" id="save-note">Your marks and notes are saved in this browser on this device.</p>
+    </div>
+    <div id="sections"></div>
+  </section>
+
+  <!-- TESTS -->
+  <section id="tab-tests" class="panel">
+    <div class="card"><p class="muted">Run these on the iPad you are inspecting, in Safari. Allow camera, microphone and motion when asked. Mark each test and the matching checklist items update.</p>
+      <div class="row wrap" id="test-jump"></div>
+    </div>
+
+    <div class="card test" id="t-colours">
+      <h2>Screen colours</h2>
+      <p>Full brightness first. Tap to move through black, white, red, green, blue, grey and a gradient. Look for dots that stay one colour (dead or stuck pixels), bright edges on black (backlight bleed), and blotches or tint on white and grey.</p>
+      <p class="muted small">Exit: press and hold for 1 second, or tap with two fingers.</p>
+      <div class="row wrap"><button class="btn primary" id="colour-start">Start colour test</button></div>
+      <div class="mark" data-test="colours" data-items="p5,p6"></div>
+    </div>
+
+    <div class="card test" id="t-touch">
+      <h2>Touch grid and multi-touch</h2>
+      <p>Opens a full screen grid. Drag a finger over every cell until it all turns green. Then put up to 10 fingers down at once: the counter should follow each finger.</p>
+      <p class="muted small">Exit with the Done button in the top corner.</p>
+      <div class="row wrap"><button class="btn primary" id="touch-start">Start touch grid</button></div>
+      <p id="touch-result" class="small"></p>
+      <div class="mark" data-test="touch" data-items="p7"></div>
+    </div>
+
+    <div class="card test" id="t-speakers">
+      <h2>Stereo speakers</h2>
+      <p>Hold the iPad in landscape at medium volume. Left should come from the left end, right from the right end, and the sweep should glide across. The bass tone should not buzz or rattle.</p>
+      <div class="row wrap">
+        <button class="btn primary" data-tone="left">Left</button>
+        <button class="btn primary" data-tone="right">Right</button>
+        <button class="btn" data-tone="both">Both</button>
+        <button class="btn" data-tone="sweep">Sweep left to right</button>
+        <button class="btn" data-tone="bass">Bass rattle check</button>
+        <button class="btn" data-tone="loud">Loud test (high volume)</button>
+      </div>
+      <p id="spk-msg" class="muted small"></p>
+      <div class="mark" data-test="speakers" data-items="a1"></div>
+    </div>
+
+    <div class="card test" id="t-mic">
+      <h2>Microphone</h2>
+      <p>Allow microphone access, speak for 5 seconds from arm's length, then play it back. Listen for muffled or crackly sound.</p>
+      <div class="row wrap">
+        <button class="btn primary" id="mic-rec">Record 5 seconds</button>
+        <button class="btn" id="mic-play" disabled>Play back</button>
+      </div>
+      <div class="meter"><div id="mic-level"></div></div>
+      <p id="mic-msg" class="muted small"></p>
+      <div class="mark" data-test="mic" data-items="a2"></div>
+    </div>
+
+    <div class="card test" id="t-camera">
+      <h2>Front and back cameras</h2>
+      <p>Check both cameras show a sharp, clean picture. Point the back camera at text up close and far away and look for blur patches, dust spots or haze.</p>
+      <div class="row wrap">
+        <button class="btn primary" id="cam-front">Front camera</button>
+        <button class="btn primary" id="cam-back">Back camera</button>
+        <button class="btn" id="cam-snap" disabled>Snapshot</button>
+        <button class="btn ghost" id="cam-stop" disabled>Stop</button>
+      </div>
+      <div class="cam-wrap"><video id="cam-video" playsinline muted autoplay></video></div>
+      <p id="cam-msg" class="muted small"></p>
+      <div id="cam-snaps" class="snaps"></div>
+      <div class="mark" data-test="camera" data-items="k1,k3"></div>
+    </div>
+
+    <div class="card test" id="t-motion">
+      <h2>Motion sensors</h2>
+      <p>Tap Start and allow Motion and Orientation Access. Tilt the iPad slowly: the bubble and numbers should move smoothly. Flat on a table, tilt should read close to 0.</p>
+      <div class="row wrap"><button class="btn primary" id="motion-start">Start sensors</button></div>
+      <div class="level"><div id="bubble"></div></div>
+      <p id="motion-vals" class="mono small"></p>
+      <p id="motion-msg" class="muted small"></p>
+      <div class="mark" data-test="motion" data-items="w4"></div>
+    </div>
+
+    <div class="card test" id="t-pencil">
+      <h2>Apple Pencil and drawing pad</h2>
+      <p>Draw across the pad with a finger and, if you have one, an Apple Pencil (USB-C or 1st generation). Lines should follow the tip with no gaps. With a Pencil, rest your palm on the pad: it should not draw.</p>
+      <div class="row wrap"><button class="btn" id="pad-clear">Clear pad</button></div>
+      <canvas id="pad"></canvas>
+      <p id="pad-info" class="mono small"></p>
+      <div class="mark" data-test="pencil" data-items="e2"></div>
+    </div>
+
+    <div class="card test" id="t-info">
+      <h2>Screen info</h2>
+      <div id="screen-info" class="props"></div>
+      <p class="muted small">At default display settings an iPad (A16) reports 820 x 1180 points (either order) with a pixel ratio of 2, matching its 2360 by 1640 pixel display. Max touch points above 1 means multi-touch is reported.</p>
+    </div>
+
+    <div class="card test" id="t-wifi">
+      <h2>Wi-Fi speed</h2>
+      <p>Join your phone hotspot or the cafe Wi-Fi, open fast.com and compare with the same test on your phone. Similar results means Wi-Fi is healthy.</p>
+      <div class="row wrap"><a class="btn" href="https://fast.com" target="_blank" rel="noopener noreferrer">Open fast.com</a></div>
+    </div>
+
+    <div class="card" id="t-tricks">
+      <h2>Fast tricks in Settings and apps</h2>
+      <ol class="steps">
+        <li><b>Battery in seconds.</b> Pull down on the Home Screen, type battery, open Battery Health. Note maximum capacity, cycle count and first use date.</li>
+        <li><b>Serial and warranty.</b> Settings > General > About, press and hold Serial Number to copy it, then check it at checkcoverage.apple.com.</li>
+        <li><b>Repair history.</b> Settings > General > About. A Parts and Service History section appears only if a part was replaced. Unknown next to a part means non-genuine or unverified.</li>
+        <li><b>Company or school lock (MDM).</b> Settings > General > VPN & Device Management. There should be no management profile.</li>
+        <li><b>Microphone.</b> Voice Memos: record 10 seconds and play it back.</li>
+        <li><b>Both cameras.</b> Camera app: take a photo and a short video with the rear and the front camera, then flip through them in Photos.</li>
+        <li><b>Apple Pencil.</b> Notes > new note > drawing tool. Draw across the whole screen and check for gaps.</li>
+        <li><b>Close look at marks.</b> Magnifier app on your own phone helps you inspect scratches, the port and the camera glass.</li>
+        <li><b>Erase in front of you.</b> Settings > General > Transfer or Reset iPad > Erase All Content and Settings. The seller enters their Apple Account password if asked.</li>
+        <li><b>Confirm no Activation Lock.</b> After the erase, go through setup. It must not ask for the previous owner's Apple Account and must not show a Remote Management screen.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- THIS IPAD -->
+  <section id="tab-ipad" class="panel">
+    <div class="card">
+      <h2>This iPad</h2>
+      <div id="facts" class="props"></div>
+      <p class="muted small">Colour: MD3Y4HN/A is the Silver model, and the seller confirmed silver. iPad (A16) only comes in Silver, Blue, Pink and Yellow, so a body colour that does not match the part number is a red flag.</p>
+      <p class="muted small">Everything here comes from the seller's photos. Pre-marked checklist items say so and still need a quick look in person.</p>
+    </div>
+    <div class="card warn">
+      <h2>Before you pay</h2>
+      <p>The iPad is still signed in to the seller's Apple Account (<span data-fact="acct"></span>). The seller must sign out and you must watch the iPad erase and reach the Hello screen with no Activation Lock. No token or advance payment.</p>
+    </div>
+    <div class="card">
+      <h2>Price check</h2>
+      <table class="tbl">
+        <tr><td>Apple India new, 128 GB Wi-Fi</td><td>₹49,900</td></tr>
+        <tr><td>Reliance Digital listing, same model</td><td>₹47,999</td></tr>
+        <tr><td>Launch price, March 2025</td><td>₹34,900</td></tr>
+        <tr class="em"><td>Seller asking</td><td>₹30,000</td></tr>
+        <tr><td>Open at</td><td>about ₹26,000</td></tr>
+        <tr><td>Fair target</td><td>₹27,500 to ₹28,500</td></tr>
+        <tr><td>Pay up to</td><td>₹30,000, only with box, invoice, charger and every check passing</td></tr>
+      </table>
+      <p class="muted small">₹30,000 is 60% of today's Apple India price for a young iPad with warranty and a 96% battery, so it is already fair. Ask for more off for any missing box, invoice or charger, or any marks you find.</p>
+    </div>
+    <div class="card">
+      <h2>Battery terms</h2>
+      <p><b>96% maximum capacity</b> means the battery holds 96% of the charge it held when new. <b>80% limit</b> is the Charging setting that stops charging at 80% to slow wear; it is on by choice and can be switched off in Settings > Battery > Charging.</p>
+    </div>
+    <div class="card">
+      <h2>Edit details</h2>
+      <p class="muted small">Stored only in this browser. Not part of the website.</p>
+      <div id="fact-edit"></div>
+    </div>
+  </section>
+</main>
+
+<!-- Fullscreen overlays -->
+<div id="colour-ov" class="overlay" hidden><span id="colour-label"></span></div>
+<div id="touch-ov" class="overlay" hidden>
+  <div id="touch-grid"></div>
+  <div id="touch-hud"><span id="touch-pct">0%</span> <span id="touch-now">0 touches</span> <span id="touch-max">max 0</span> <button id="touch-done" class="btn">Done</button> <button id="touch-clear" class="btn ghost">Clear</button></div>
+  <div id="touch-dots"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
